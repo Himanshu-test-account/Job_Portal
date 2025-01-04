@@ -1,142 +1,172 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { submitContactForm } from '../store/slices/contactSlice';
 
-const ContactUs = () => {
+const ContactForm = () => {
+  const dispatch = useDispatch();
+  const { loading, error, message } = useSelector((state) => state.contact); // Access contact slice
+
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: ""
+    name: '',
+    email: '',
+    subject: '',
+    message: '',
   });
 
+  const [formErrors, setFormErrors] = useState({
+    name: '',
+    email: '',
+    message: '',
+  });
+
+  // Handle form input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Basic validation for the form
+  const validateForm = () => {
+    const errors = {};
+    if (!formData.name) errors.name = 'Name is required';
+    if (!formData.email) errors.email = 'Email is required';
+    if (!formData.message) errors.message = 'Message is required';
+    return errors;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission (e.g., send data to API or email)
-    console.log("Form submitted with data:", formData);
-    // Clear the form after submission
-    setFormData({
-      name: "",
-      email: "",
-      subject: "",
-      message: ""
-    });
+    
+    const errors = validateForm(); // Validate form inputs
+    setFormErrors(errors); // Set the errors
+    if (Object.keys(errors).length > 0) return; // Prevent form submission if there are validation errors
+
+    dispatch(submitContactForm(formData)); // Dispatch action to submit the contact form
   };
 
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
-      <h1>Contact Us</h1>
-      <p>If you have any questions or need assistance, feel free to contact us!</p>
+    <div className="contact-form-container">
+      <h2>Contact Us</h2>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="Your Name"
+          />
+          {formErrors.name && <p className="error">{formErrors.name}</p>}
+        </div>
+        <div className="form-group">
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="Your Email"
+          />
+          {formErrors.email && <p className="error">{formErrors.email}</p>}
+        </div>
+        <div className="form-group">
+          <input
+            type="text"
+            name="subject"
+            value={formData.subject}
+            onChange={handleChange}
+            placeholder="Subject"
+          />
+        </div>
+        <div className="form-group">
+          <textarea
+            name="message"
+            value={formData.message}
+            onChange={handleChange}
+            placeholder="Your Message"
+          />
+          {formErrors.message && <p className="error">{formErrors.message}</p>}
+        </div>
+        <button type="submit" disabled={loading}>
+          {loading ? 'Submitting...' : 'Submit'}
+        </button>
+      </form>
 
-      <section>
-        <h2>Contact Form</h2>
-        <form onSubmit={handleSubmit} style={{ maxWidth: "600px" }}>
-          <div style={{ marginBottom: "10px" }}>
-            <label htmlFor="name" style={{ display: "block" }}>Name:</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Your name"
-              style={{
-                padding: "8px",
-                width: "100%",
-                borderRadius: "4px",
-                border: "1px solid #ccc"
-              }}
-            />
-          </div>
+      {error && <p className="error">{error}</p>}
+      {message && <p className="success">{message}</p>}
 
-          <div style={{ marginBottom: "10px" }}>
-            <label htmlFor="email" style={{ display: "block" }}>Email:</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Your email address"
-              style={{
-                padding: "8px",
-                width: "100%",
-                borderRadius: "4px",
-                border: "1px solid #ccc"
-              }}
-            />
-          </div>
+      {/* Add styles directly within the component */}
+      <style jsx>{`
+        .contact-form-container {
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+          background-color: #f9f9f9;
+          border-radius: 8px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
 
-          <div style={{ marginBottom: "10px" }}>
-            <label htmlFor="subject" style={{ display: "block" }}>Subject:</label>
-            <input
-              type="text"
-              id="subject"
-              name="subject"
-              value={formData.subject}
-              onChange={handleChange}
-              placeholder="Subject of your message"
-              style={{
-                padding: "8px",
-                width: "100%",
-                borderRadius: "4px",
-                border: "1px solid #ccc"
-              }}
-            />
-          </div>
+        h2 {
+          font-size: 28px;
+          margin-bottom: 20px;
+          color: #333;
+          text-align: center;
+        }
 
-          <div style={{ marginBottom: "10px" }}>
-            <label htmlFor="message" style={{ display: "block" }}>Message:</label>
-            <textarea
-              id="message"
-              name="message"
-              value={formData.message}
-              onChange={handleChange}
-              placeholder="Your message"
-              rows="5"
-              style={{
-                padding: "8px",
-                width: "100%",
-                borderRadius: "4px",
-                border: "1px solid #ccc",
-                resize: "vertical"
-              }}
-            />
-          </div>
+        .form-group {
+          margin-bottom: 15px;
+        }
 
-          <button
-            type="submit"
-            style={{
-              padding: "10px 15px",
-              backgroundColor: "#007BFF",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-            }}
-          >
-            Send Message
-          </button>
-        </form>
-      </section>
+        input,
+        textarea {
+          width: 100%;
+          padding: 10px;
+          margin: 8px 0;
+          border-radius: 4px;
+          border: 1px solid #ccc;
+          box-sizing: border-box;
+          font-size: 16px;
+        }
 
-      <section style={{ marginTop: "30px" }}>
-        <h2>Our Contact Details</h2>
-        <p>If you prefer to contact us directly, here are our details:</p>
-        <ul>
-          <li>Email: <a href="mailto:info@example.com">info@example.com</a></li>
-          <li>Phone: +1 234 567 890</li>
-          <li>Address: 1234 Some St, City, Country</li>
-        </ul>
-      </section>
+        textarea {
+          resize: vertical;
+          min-height: 150px;
+        }
+
+        button {
+          background-color: #007bff;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          font-size: 16px;
+          cursor: pointer;
+          border-radius: 4px;
+          width: 100%;
+          transition: background-color 0.3s ease;
+        }
+
+        button:disabled {
+          background-color: #ddd;
+          cursor: not-allowed;
+        }
+
+        button:hover:enabled {
+          background-color: #0056b3;
+        }
+
+        .error {
+          color: red;
+          font-size: 14px;
+          margin-top: 5px;
+        }
+
+        .success {
+          color: green;
+          font-size: 16px;
+          margin-top: 20px;
+        }
+      `}</style>
     </div>
   );
 };
 
-export default ContactUs;
+export default ContactForm;

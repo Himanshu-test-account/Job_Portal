@@ -10,6 +10,9 @@ import PostApplication from "./pages/PostApplication";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
+import ContactUs from "./support/ContactUs";
+import EmployerSupport from "./support/EmployerSupport";
+import JobSeekerHelp from "./support/JobSeekerHelp";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch, useSelector } from "react-redux";
@@ -47,6 +50,9 @@ const App = () => {
           <Route path="/post/application/:jobId" element={<PostApplication />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/contact" element={<ContactUs />} />
+          <Route path="/support/jobseeker-help" element={<JobSeekerHelp />} />
+          <Route path="/support/employer-support" element={<EmployerSupport />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Footer />
