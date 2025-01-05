@@ -1,16 +1,29 @@
 import React, { useState } from "react";
-import {postJob} from "../store/slices/jobSlice";
+import { useDispatch } from "react-redux";
+import { postJob } from "../store/slices/jobSlice";
+import { toast } from "react-toastify";
 
 const EmployerSupport = () => {
   const [jobTitle, setJobTitle] = useState("");
   const [jobDescription, setJobDescription] = useState("");
   const [companyName, setCompanyName] = useState("");
 
+  const dispatch = useDispatch();
+
   const handlePostJob = (e) => {
+    e.preventDefault();
+    const formData = new FormData();
     formData.append("companyName", companyName);
-    formData.append("Jobtitle", title);
-    formData.append("description", introduction)
-     dispatch(postJob(formData));
+    formData.append("jobTitle", jobTitle);
+    formData.append("jobDescription", jobDescription);
+
+    dispatch(postJob(formData))
+      .then(() => {
+        toast.success("Job posted successfully!");
+      })
+      .catch((error) => {
+        toast.error(error.message);
+      });
   };
 
   return (
@@ -20,7 +33,7 @@ const EmployerSupport = () => {
 
       <section>
         <h2 style={styles.subHeading}>Post a Job Opening</h2>
-        <form style={styles.form}>
+        <form style={styles.form} onSubmit={handlePostJob}>
           <div style={styles.inputGroup}>
             <label htmlFor="companyName" style={styles.label}>Company Name:</label>
             <input
@@ -54,11 +67,9 @@ const EmployerSupport = () => {
               style={styles.textarea}
             />
           </div>
-          <button type="submit" style={styles.submitButton} onClick={handlePostJob}>Post Job</button>
+          <button type="submit" style={styles.submitButton}>Post Job</button>
         </form>
       </section>
-
-      {/* Additional sections omitted for brevity */}
     </div>
   );
 };
@@ -128,23 +139,6 @@ const styles = {
     fontSize: "1rem",
     width: "100%",
   },
-  section: {
-    marginTop: "30px",
-  },
-  list: {
-    paddingLeft: "20px",
-    lineHeight: "1.6",
-  },
-  link: {
-    color: "#007bff",
-    textDecoration: "none",
-  },
 };
 
 export default EmployerSupport;
-
-
-
-
-
-
